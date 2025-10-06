@@ -1,5 +1,5 @@
 <p align='center'>
-  <img src='assets/logo.png' alt='IORQ Logo' width='600'/>
+  <img src='logo.png' alt='IORQ Logo' width='600'/>
 </p>
 
 # Sobre a IORQ
