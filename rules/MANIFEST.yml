@@ -1,0 +1,47 @@
+# MANIFEST — mapping canônico de regras para globs de path
+#
+# O reviewer (Beethoven) lê este arquivo e, para cada entry, verifica se
+# algum path tocado pelo PR casa com os globs em `when`. Se casa, o arquivo
+# em `file` é incluído no contexto do review.
+#
+# Valores especiais:
+#   when: always   → sempre incluído
+#
+# Os globs seguem sintaxe padrão (fnmatch / PurePath.match):
+#   **/*.py              → qualquer arquivo .py em qualquer profundidade
+#   apps/*-ds/**         → qualquer coisa sob apps com sufixo -ds
+#
+# Novos arquivos de regra devem ser adicionados aqui E criados em rules/.
+
+rules:
+  - file: pr-level.md
+    when: always
+
+  - file: python.md
+    when:
+      - "**/*.py"
+
+  - file: frontend.md
+    when:
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+
+  - file: design-system.md
+    when:
+      - "apps/*-ds/**"
+      - "services/*-ds/**"
+      - "packages/*-ds/**"
+
+  - file: testing.md
+    when:
+      - "**/tests/**"
+      - "**/test_*.py"
+      - "**/*_test.py"
+      - "**/*.test.ts"
+      - "**/*.test.tsx"
+      - "**/*.spec.ts"
+      - "**/*.spec.tsx"
+      - "**/*.component.test.tsx"
+      - "**/*.unit.test.ts"
