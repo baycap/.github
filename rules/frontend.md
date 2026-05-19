@@ -90,8 +90,8 @@ interface UseFeature {
 const useFeature = (): UseFeature => { /* ... */ };
 ```
 
-- `useCallback` para event handlers (especialmente quando passados como prop)
-- `useMemo` para computed values caros
+- `useCallback` deve ser usado para cachear funções apenas nos casos em que as mesmas são passadas em uma dependency array de algum outro hook (como `useEffect` ou `useMemo`) ou como props (apenas para componentes memoizados com `React.memo`). Não use `useCallback` em outros casos.
+- `useMemo` para computações muito caras
 
 ## Services Pattern (data fetching)
 
