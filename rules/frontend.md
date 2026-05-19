@@ -90,7 +90,7 @@ interface UseFeature {
 const useFeature = (): UseFeature => { /* ... */ };
 ```
 
-- `useCallback` deve ser usado para cachear funções apenas nos casos em que as mesmas são passadas em uma lista de dependências de um `useMemo` ou como props (apenas para componentes memoizados com `React.memo`)
+- `useCallback` deve ser usado para cachear funções apenas nos casos em que as mesmas são passadas em uma lista de dependências de um `useMemo` ou como props (apenas para componentes memoizados com `React.memo`).
 - `useMemo` para computed values caros
 
 ## Services Pattern (data fetching)
