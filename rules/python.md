@@ -265,3 +265,99 @@ Classe é o padrão default no projeto — funções standalone só quando há c
 ### Sem código especulativo
 
 Não escrever código para cenários que o contrato garante que não acontecem. `if` para casos impossíveis, validação dupla, fallbacks redundantes — tudo lixo. Se a invariante muda, o teste pega.
+
+## Python-specific Quirks
+
+Regras genuinamente específicas da linguagem — não tentar generalizar para outras linguagens, porque o comportamento que descrevem é peculiar do Python.
+
+### `assert` em produção — slug `CLAUDE_MD:assert-in-production`
+
+**Princípio:** `assert` em Python é **removido em runtime** quando o interpretador roda com `-O` (e ambientes de produção otimizados frequentemente rodam assim). Usar `assert` para validar invariantes de domínio, autenticação, entrada do usuário, ou qualquer coisa que dependa da checagem rodar é bug latente.
+
+**Severidade:** `blocker` (`SEC:assert-as-validation`) quando o `assert` está cobrindo segurança / autorização / validação de input; `major` (`BUG:assert-as-validation`) em outros casos.
+
+```python
+# ❌ — em produção com -O, esta linha desaparece. Usuário não autorizado passa.
+def transfer(user: User, amount: Decimal) -> None:
+    assert user.is_admin, "Only admins can transfer"
+    do_transfer(amount)
+
+# ❌ — input do usuário sem validação real
+def parse_amount(raw: str) -> Decimal:
+    value = Decimal(raw)
+    assert value > 0, "Amount must be positive"
+    return value
+```
+
+```python
+# ✅ — validação explícita com exceção que persiste em produção
+def transfer(user: User, amount: Decimal) -> None:
+    if not user.is_admin:
+        raise PermissionDeniedError("Only admins can transfer")
+    do_transfer(amount)
+
+def parse_amount(raw: str) -> Decimal:
+    value = Decimal(raw)
+    if value <= 0:
+        raise InvalidAmountError("Amount must be positive")
+    return value
+```
+
+**Quando `assert` é aceitável:**
+
+- **Testes** (`assert` é a forma idiomática do pytest/unittest plain).
+- **Invariantes internas que documentam pressupostos de programação** — não validação. Ex.: `assert isinstance(node, LeafNode)` em uma função privada que recebe nó de tipo já filtrado. Mesmo aqui, prefira `if not isinstance(...): raise TypeError(...)` quando o custo é baixo, porque o `assert` some com `-O`.
+
+### Mutable default argument — slug `CLAUDE_MD:mutable-default-argument`
+
+**Princípio:** valores default de parâmetros em Python são avaliados **uma única vez na definição da função**, não a cada chamada. Quando o default é um objeto mutável (`list`, `dict`, `set`, instância de `BaseModel`), todas as chamadas que não passam o argumento explicitamente compartilham o **mesmo objeto** — e mutações entre chamadas vazam.
+
+**Severidade:** `major` (`BUG:mutable-default-argument`). `blocker` quando o objeto compartilhado armazena estado por-request (ex.: handler de endpoint).
+
+```python
+# ❌ — chamadas sucessivas acumulam estado
+def append_log(message: str, history: list[str] = []) -> list[str]:
+    history.append(message)
+    return history
+
+append_log("a")            # ["a"]
+append_log("b")            # ["a", "b"]  — não é o que o leitor espera
+
+# ❌ — dict default compartilhado
+def build_options(extras: dict = {}) -> dict:
+    extras["timestamp"] = now()
+    return extras
+```
+
+```python
+# ✅ — sentinel + criação dentro da função
+def append_log(message: str, history: list[str] | None = None) -> list[str]:
+    if history is None:
+        history = []
+    history.append(message)
+    return history
+
+def build_options(extras: dict | None = None) -> dict:
+    extras = {**(extras or {})}  # cópia rasa para não mutar o argumento
+    extras["timestamp"] = now()
+    return extras
+```
+
+**Sub-caso relevante: `Field(default_factory=...)` em Pydantic.**
+
+```python
+# ❌ — instância única de Address compartilhada entre todos os User criados sem address
+class User(BaseModel):
+    name: str
+    address: Address = Address(street="", city="")
+
+# ✅ — factory chamada a cada construção
+class User(BaseModel):
+    name: str
+    address: Address = Field(default_factory=lambda: Address(street="", city=""))
+```
+
+**Quando NÃO se aplica:**
+
+- Default **imutável** (`int`, `str`, `tuple`, `frozenset`, `None`, instância de `BaseModel` congelada via `model_config = ConfigDict(frozen=True)`). Sem mutação possível, sem bug.
+- Default que é uma **constante intencional e somente leitura** — ainda assim, marcar o tipo (`Final`, `frozenset`) deixa a intenção explícita e evita regressão.
