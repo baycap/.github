@@ -45,3 +45,62 @@ rules:
       - "**/*.spec.tsx"
       - "**/*.component.test.tsx"
       - "**/*.unit.test.ts"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Principles-based rules (linguagem-agnósticas).
+  #
+  # Estas entries ativam regras universais escritas em rules/principles/. As
+  # mesmas regras se aplicam a backend Python e frontend TS — só os exemplos
+  # de código em cada arquivo é que diferem por linguagem.
+  #
+  # O reviewer é não-bloqueante (apenas comenta), então todas as categorias são
+  # ativadas juntas — a precisão se ajusta via feedback do time, não via cadência.
+  # ─────────────────────────────────────────────────────────────────────────────
+
+  - file: principles/secrets-and-injection.md
+    when:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+
+  - file: principles/error-handling.md
+    when:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+
+  - file: principles/runtime-correctness.md
+    when:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+
+  - file: principles/data-access-and-batching.md
+    when:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+
+  - file: principles/algorithmic-complexity.md
+    when:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+
+  - file: principles/code-complexity.md
+    when:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
