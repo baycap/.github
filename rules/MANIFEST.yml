@@ -45,3 +45,72 @@ rules:
       - "**/*.spec.tsx"
       - "**/*.component.test.tsx"
       - "**/*.unit.test.ts"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Principles-based rules (linguagem-agnósticas).
+  #
+  # Estas entries ativam regras universais escritas em rules/principles/. As
+  # mesmas regras se aplicam a backend Python e frontend TS — só os exemplos
+  # de código em cada arquivo é que diferem por linguagem.
+  #
+  # IMPORTANTE: ativação cadenciada — adicionar entries gradualmente, uma
+  # categoria por semana, das mais inquestionáveis (secrets, security) para
+  # as mais semânticas (data-access, complexidade). Preservar precisão alta
+  # do reviewer nas primeiras semanas é o que sustenta credibilidade
+  # institucional.
+  #
+  # Rollout: descomentar UMA entry por vez, observar ~1 semana antes da próxima.
+  # Semana 1 (ativa abaixo): secrets-and-injection.
+  # Semanas seguintes (ainda comentadas): error-handling, runtime-correctness,
+  # code-complexity, algorithmic-complexity, data-access-and-batching.
+  # ─────────────────────────────────────────────────────────────────────────────
+
+  - file: principles/secrets-and-injection.md
+    when:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+
+  # --- Próximas semanas (descomentar uma por vez) ---
+  #
+  # - file: principles/error-handling.md
+  #   when:
+  #     - "**/*.py"
+  #     - "**/*.ts"
+  #     - "**/*.tsx"
+  #     - "**/*.js"
+  #     - "**/*.jsx"
+  #
+  # - file: principles/runtime-correctness.md
+  #   when:
+  #     - "**/*.py"
+  #     - "**/*.ts"
+  #     - "**/*.tsx"
+  #     - "**/*.js"
+  #     - "**/*.jsx"
+  #
+  # - file: principles/code-complexity.md
+  #   when:
+  #     - "**/*.py"
+  #     - "**/*.ts"
+  #     - "**/*.tsx"
+  #     - "**/*.js"
+  #     - "**/*.jsx"
+  #
+  # - file: principles/algorithmic-complexity.md
+  #   when:
+  #     - "**/*.py"
+  #     - "**/*.ts"
+  #     - "**/*.tsx"
+  #     - "**/*.js"
+  #     - "**/*.jsx"
+  #
+  # - file: principles/data-access-and-batching.md
+  #   when:
+  #     - "**/*.py"
+  #     - "**/*.ts"
+  #     - "**/*.tsx"
+  #     - "**/*.js"
+  #     - "**/*.jsx"
